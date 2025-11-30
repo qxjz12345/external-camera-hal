@@ -32,9 +32,10 @@ jobs:
     - name: Download minimal AOSP
       run: |
         mkdir -p aosp && cd aosp
-        repo init -u https://android.googlesource.com/platform/manifest -b android-10.0.0_r47 --depth=1 --partial-clone
+        repo init -u https://android.googlesource.com/platform/manifest -b android-10.0.0_r47 --depth=1
         
-        # 只同步必要的项目
+        # 创建目录并添加配置
+        mkdir -p .repo/local_manifests
         cat > .repo/local_manifests/remove_projects.xml << 'EOF'
         <?xml version="1.0" encoding="UTF-8"?>
         <manifest>
@@ -43,7 +44,8 @@ jobs:
         </manifest>
         EOF
         
-        repo sync -c -j$(nproc) --no-tags --no-clone-bundle \
+        # 只同步必要的项目
+        repo sync -c -j$(nproc) --no-tags --no-clone-bundle --force-sync \
           hardware/interfaces \
           system/core \
           system/libbase \
