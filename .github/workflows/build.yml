@@ -34,18 +34,8 @@ jobs:
         mkdir -p aosp && cd aosp
         repo init -u https://android.googlesource.com/platform/manifest -b android-10.0.0_r47 --depth=1
         
-        # 创建目录并添加配置
-        mkdir -p .repo/local_manifests
-        cat > .repo/local_manifests/remove_projects.xml << 'EOF'
-        <?xml version="1.0" encoding="UTF-8"?>
-        <manifest>
-          <remove-project name="kernel/msm" />
-          <remove-project name="device/google/coral" />
-        </manifest>
-        EOF
-        
         # 只同步必要的项目
-        repo sync -c -j$(nproc) --no-tags --no-clone-bundle --force-sync \
+        repo sync -c -j$(nproc) --no-tags --no-clone-bundle \
           hardware/interfaces \
           system/core \
           system/libbase \
@@ -55,7 +45,8 @@ jobs:
           build/make \
           build/soong \
           prebuilts/clang/host/linux-x86 \
-          prebuilts/build-tools
+          prebuilts/build-tools \
+          prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
     
     - name: Build
       run: |
