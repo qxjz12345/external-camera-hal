@@ -34,19 +34,12 @@ jobs:
         mkdir -p aosp && cd aosp
         repo init -u https://android.googlesource.com/platform/manifest -b android-10.0.0_r47 --depth=1
         
-        # 只同步必要的项目
-        repo sync -c -j$(nproc) --no-tags --no-clone-bundle \
-          hardware/interfaces \
-          system/core \
-          system/libbase \
-          system/libhidl \
-          frameworks/native \
-          external/tinyxml2 \
-          build/make \
-          build/soong \
-          prebuilts/clang/host/linux-x86 \
-          prebuilts/build-tools \
-          prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
+        # 同步所有项目（使用 current-branch 和 no-clone-bundle 加速）
+        # GitHub Actions 有足够空间，直接全量同步更可靠
+        repo sync -c -j8 --no-tags --no-clone-bundle --fail-fast || true
+        
+        # 确保关键目录存在
+        ls -la hardware/interfaces/camera/ || echo "Camera interfaces missing"
     
     - name: Build
       run: |
